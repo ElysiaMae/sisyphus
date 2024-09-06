@@ -47,7 +47,7 @@ func FixPNGIHDR(bin []byte, maxDim int) (fixedBin []byte, width []byte, height [
 			crc32Result := crc32.ChecksumIEEE(ihdr)
 
 			if crc32Result == crc32Key {
-				copy(bin[12:29], ihdr) // 将 IDHR Copy 到原位置
+				copy(bin[12:29], ihdr) // 将 IHDR Copy 到原位置
 				return bin, width, height, nil
 			}
 		}

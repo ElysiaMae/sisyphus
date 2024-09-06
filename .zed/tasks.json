@@ -1,0 +1,7 @@
+[
+  {
+    "label": "go test full",
+    "command": "go test -v ${ZED_CUSTOM_GO_PACKAGE} -timeout 60s -run $ZED_SYMBOL",
+    "tags": ["go-test"]
+  }
+]
