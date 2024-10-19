@@ -1,4 +1,4 @@
-package crypto
+package cryptography
 
 import (
 	"crypto/aes"
@@ -6,10 +6,11 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 )
 
-// MARK: AES-GCM 加密
+// MARK: AES-GCM Encrypt
 
 // 调用方式：使用 generate.GenerateSafeRandomBytes 生成对应密钥再调用加解密函数，可以参照测试代码
 
@@ -97,4 +98,43 @@ func AESGCMDecrypt(cipherText, key []byte) ([]byte, error) {
 	}
 
 	return plainText, nil
+}
+
+// MARK: AES-CBC Encrypt
+
+func AESCBCEncrypt(plaintext []byte, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return nil, err
+	}
+
+	mode := cipher.NewCBCEncrypter(block, iv)
+	mode.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
+
+	return ciphertext, nil
+}
+
+// MARK: AES-CBC Decrypt
+
+func AESCBCDecrypt(ciphertext []byte, key []byte, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(ciphertext) < aes.BlockSize {
+		return nil, fmt.Errorf("ciphertext too short")
+	}
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	mode := cipher.NewCBCDecrypter(block, iv)
+	mode.CryptBlocks(ciphertext, ciphertext)
+
+	return ciphertext, nil
 }
