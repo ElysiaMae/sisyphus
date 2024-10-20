@@ -6,7 +6,6 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"fmt"
 	"hash"
 	"io"
 	"log/slog"
@@ -119,3 +118,4 @@ func ZIPHashC(f *zip.File, t encoding.HashType, wg *sync.WaitGroup, r chan<- sis
 
 	// Calculate Hash
 	r <- sisyphus.Pair[string, []byte]{First: f.Name,Second: hasher.Sum(nil)}
+}
