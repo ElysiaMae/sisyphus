@@ -49,6 +49,7 @@ func SliceReverse[T any](slice []T) []T {
 	for i, j := 0, len(slice)-1; i < j; i, j = i+1, j-1 {
 		slice[i], slice[j] = slice[j], slice[i]
 	}
+
 	return slice
 }
 
@@ -58,6 +59,7 @@ func IntToChar(arr []int) string {
 	for _, num := range arr {
 		result += string(rune(num))
 	}
+
 	return result
 }
 
@@ -65,6 +67,7 @@ func PrintHexArr(data []byte) {
 	for _, b := range data {
 		fmt.Printf("%02X, ", b)
 	}
+
 	fmt.Println()
 }
 
@@ -72,5 +75,6 @@ func ReversePrintArr(arr []string) {
 	for i := len(arr) - 1; i >= 0; i-- {
 		fmt.Print(arr[i])
 	}
+
 	fmt.Println()
 }

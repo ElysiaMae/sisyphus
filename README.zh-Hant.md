@@ -1,5 +1,7 @@
 # sisyphus
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/ElysiaMae/sisyphus.svg)](https://pkg.go.dev/github.com/ElysiaMae/sisyphus)
+
 [English](./README.md) · **繁体中文** · [简体中文](./README.zh-Hans.md)
 
 這是一個由 Go 語言初學者和 CTF 新手創建的項目，包含部分算法和數據結構的簡單實現。這個項目也可以作為獨立的庫使用。

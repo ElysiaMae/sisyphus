@@ -1,6 +1,7 @@
 package sisyphus
 
 // by https://betterstack.com/community/guides/logging/logging-in-go/
+// by https://dusted.codes/creating-a-pretty-console-logger-using-gos-slog-package
 
 import (
 	"context"
@@ -8,9 +9,49 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-
-	"github.com/fatih/color"
+	"strings"
 )
+
+// 256 Color
+// This will be compatible with macOS Terminal.app and iTerm2.app.
+// Currently, iTerm2.app supports up to xterm-256color.
+const (
+	reset = "\033[0m"
+
+	fgBlack   = "232"
+	fgRed     = "9"
+	fgGreen   = "10"
+	fgYellow  = "11"
+	fgBlue    = "12"
+	fgMagenta = "13"
+	fgCyan    = "14"
+	fgWhite   = "255"
+
+	bgBlack   = "0"
+	bgRed     = "1"
+	bgGreen   = "2"
+	bgYellow  = "3"
+	bgBlue    = "4"
+	bgMagenta = "5"
+	bgCyan    = "6"
+	bgWhite   = "7"
+)
+
+// colorizeBg 支持 256 位真彩色背景和前景
+func colorizeBg(v string, fg string, bg string, bold bool) string {
+	if bold {
+		return fmt.Sprintf("\033[1;38;5;%sm\033[48;5;%sm%s%s", fg, bg, v, reset)
+	}
+	return fmt.Sprintf("\033[38;5;%sm\033[48;5;%sm%s%s", fg, bg, v, reset)
+}
+
+// colorizeBg 支持 256 位真彩色前景
+func colorize(v string, fg string, bold bool) string {
+	if bold {
+		return fmt.Sprintf("\033[1;38;5;%sm%s%s", fg, v, reset)
+	}
+	return fmt.Sprintf("\033[38;5;%sm%s%s", fg, v, reset)
+}
 
 // MARK: 控制台彩色日志输出
 
@@ -29,20 +70,14 @@ func NewColorLogHandler() *ColorLogHandler {
 // Handle implements the custom log handling logic.
 // 实现自定义的日志处理逻辑
 func (h *ColorLogHandler) Handle(ctx context.Context, r slog.Record) error {
-	level := r.Level.String()
-
-	// Set colors based on different log levels.
-	// 根据不同的日志级别设置颜色
-	switch r.Level {
-	case slog.LevelDebug:
-		level = color.HiMagentaString(level)
-	case slog.LevelInfo:
-		level = color.HiBlueString(level + " ")
-	case slog.LevelWarn:
-		level = color.HiYellowString(level + " ")
-	case slog.LevelError:
-		level = color.HiRedString(level)
+	var buildr strings.Builder
+	buildr.WriteString(" ")
+	buildr.WriteString(r.Level.String())
+	buildr.WriteString(" ")
+	if r.Level == slog.LevelInfo || r.Level == slog.LevelWarn {
+		buildr.WriteString(" ")
 	}
+	level := buildr.String()
 
 	// Process the attributes in the log and convert them to strings.
 	// 处理日志中的属性并转换为字符串
@@ -65,13 +100,31 @@ func (h *ColorLogHandler) Handle(ctx context.Context, r slog.Record) error {
 
 	// Format the time and message.
 	// 格式化时间和消息
-	timeStr := r.Time.Format("2006/01/02-15:04:05")
-	// msg := color.CyanString(r.Message)
+	timeStr := r.Time.Format("2006/01/02-15:04:05.000")
 	msg := r.Message
 
-	// println(timeStr, level, msg, color.WhiteString(string(b)))
-	fmt.Fprintf(os.Stdout, "%s %s %s %s\n",
+	// Set colors based on different log levels.
+	// 根据不同的日志级别设置颜色
+	switch r.Level {
+	case slog.LevelDebug:
+		level = colorizeBg(level, fgBlack, bgMagenta, true)
+		msg = colorize(msg, fgMagenta, false)
+	case slog.LevelInfo:
+		level = colorizeBg(level, fgBlack, bgBlue, true)
+		msg = colorize(msg, fgBlue, false)
+	case slog.LevelWarn:
+		level = colorizeBg(level, fgBlack, bgYellow, true)
+		msg = colorize(msg, fgYellow, false)
+	case slog.LevelError:
+		level = colorizeBg(level, fgBlack, bgRed, true)
+		msg = colorize(msg, fgRed, false)
+	}
+
+	_, err = fmt.Fprintf(os.Stdout, "%s |%s| %s %s\n",
 		timeStr, level, msg, string(b))
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -101,26 +154,3 @@ func (h *ColorLogHandler) WithGroup(name string) slog.Handler {
 		handler: h.handler.WithGroup(name),
 	}
 }
-
-// // 设置基本的 JSON Handler 或 Text Handler
-// baseHandler := slog.NewJSONHandler(os.Stdout, nil)
-
-// // 包装为彩色日志处理器
-// colorHandler := sisyphus.NewColorHandler(baseHandler)
-
-// // 创建彩色的 slog 记录器
-// logger := slog.New(colorHandler)
-// // logger := slog.New(sisyphus.NewColorHandler(slog.NewJSONHandler(os.Stdout, nil)))
-// logger.Debug(
-// 	"executing database query",
-// 	slog.String("query", "SELECT * FROM users"),
-// )
-// logger.Info("image upload successful", slog.String("image_id", "39ud88"))
-// logger.Warn(
-// 	"storage is 90% full",
-// 	slog.String("available_space", "900.1 MB"),
-// )
-// logger.Error(
-// 	"An error occurred while processing the request",
-// 	slog.String("url", "https://example.com"),
-// )
