@@ -1,16 +1,24 @@
 package encoding
 
-import "encoding/hex"
+import (
+	"encoding/hex"
+)
 
-func HexToStr(text string) (string, error) {
-	bytes, err := hex.DecodeString(text)
+// HexToByte Hex Bytes To String Bytes
+func HexToByte(input []byte) ([]byte, error) {
+	o := make([]byte, hex.DecodedLen(len(input)))
+	_, err := hex.Decode(o, input)
 	if err != nil {
-		return "", err
+		return o, err
 	}
 
-	return string(bytes), nil
+	return o, nil
 }
 
-func StrToHex(text string) string {
-	return hex.EncodeToString([]byte(text))
+// ByteToHex String Bytes To Hex Bytes
+func ByteToHex(input []byte) []byte {
+	o := make([]byte, hex.EncodedLen(len(input)))
+	hex.Encode(o, input)
+
+	return o
 }

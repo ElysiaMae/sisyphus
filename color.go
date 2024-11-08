@@ -111,7 +111,7 @@ func (h *ColorLogHandler) Handle(ctx context.Context, r slog.Record) error {
 		msg = colorize(msg, fgMagenta, false)
 	case slog.LevelInfo:
 		level = colorizeBg(level, fgBlack, bgBlue, true)
-		msg = colorize(msg, fgBlue, false)
+		// msg = colorize(msg, fgBlue, false)
 	case slog.LevelWarn:
 		level = colorizeBg(level, fgBlack, bgYellow, true)
 		msg = colorize(msg, fgYellow, false)
