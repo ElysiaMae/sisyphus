@@ -118,7 +118,7 @@ func getLetterFrequency() map[byte]float64 {
 	}
 }
 
-// isNumeric checks if a string contains only numeric characters.
+// IsNumeric checks if a string contains only numeric characters.
 // It iterates through each rune in the string and returns false
 // 遍历检查字符串是否为仅数字
 func IsNumeric(s string) bool {
@@ -128,6 +128,53 @@ func IsNumeric(s string) bool {
 		}
 	}
 	return len(s) > 0
+}
+
+// Combinations
+// The Combinations function generates all possible combinations of a specified length n from a given charset (character set).
+// It uses a closure to produce each combination on demand.
+// The closure can be called repeatedly to obtain one combination at a time, returning the combination as a byte slice and a boolean value indicating whether more combinations are available.
+// Combinations 函数从给定的字符集 charset 中生成指定长度 n 的所有可能组合。它使用闭包按需生成每一个组合。闭包可以被反复调用，每次返回一个新的组合，并且返回组合的字节切片和一个布尔值，表示是否还有更多的组合
+func Combinations(charset []byte, n int) func() ([]byte, bool) {
+	// Initialize an array `indices` to track the current index for each character in the charset.
+	// `indices` will keep track of the current position in the charset for each position in the combination.
+	// We also initialize `result` to store the current combination.
+	// `indices` stores the index positions, and `result` stores the combination.
+	indices := make([]int, n)
+	result := make([]byte, n)
+
+	// Closure: This function generates a new combination each time it is called.
+	// 闭包：每次调用时生成一个新的排列组合
+	return func() ([]byte, bool) {
+		// Fill the result array with the current combination based on `indices` positions in the charset.
+		// 使用 `indices` 中的当前索引填充 `result` 数组，形成当前的组合
+		for i := 0; i < n; i++ {
+			result[i] = charset[indices[i]]
+		}
+
+		// Update the `indices` array to simulate carrying over (like in counting systems).
+		// 从右到左递增 `indices` 数组，模拟进位操作
+		for i := n - 1; i >= 0; i-- {
+			indices[i]++
+			// If the index at `indices[i]` is less than the charset length, stop the carry process.
+			// 如果 `indices[i]` 小于字符集长度，停止进位
+			if indices[i] < len(charset) {
+				break
+			}
+			// If the index exceeds the charset length, reset it to 0 and move to the next index.
+			// 如果 `indices[i]` 超过字符集长度，将其重置为 0，并递增下一个索引
+			indices[i] = 0
+			// If we reach the first index and need to reset, we return the current combination and `false` indicating no more combinations are available.
+			// 如果到达第一个索引并且需要进位，表示已生成所有组合，返回当前组合并返回 `false`，表示没有更多组合
+			if i == 0 {
+				return result, false
+			}
+		}
+
+		// If there are still combinations left, return the current combination and `true`.
+		// 如果还有更多组合，返回当前组合和 `true`
+		return result, true
+	}
 }
 
 func PrintHexArr(data []byte) {

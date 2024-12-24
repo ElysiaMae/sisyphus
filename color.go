@@ -63,8 +63,12 @@ type ColorLogHandler struct {
 
 // NewColorLogHandler creates a new colorized log handler that outputs only to os.Stdout.
 // 创建新的彩色日志处理器，输出固定到 os.Stdout
-func NewColorLogHandler() *ColorLogHandler {
-	return &ColorLogHandler{handler: slog.NewJSONHandler(os.Stdout, nil)}
+func NewColorLogHandler(opts *slog.HandlerOptions) *ColorLogHandler {
+	if opts == nil {
+		return &ColorLogHandler{handler: slog.NewJSONHandler(os.Stdout, nil)}
+	} else {
+		return &ColorLogHandler{handler: slog.NewJSONHandler(os.Stdout, opts)}
+	}
 }
 
 // Handle implements the custom log handling logic.

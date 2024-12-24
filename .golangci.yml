@@ -1,4 +1,24 @@
-"go.lintTool": "golangci-lint",
-"go.lintFlags": [
-  "--fast"
-]
+# 运行配置
+run:
+  timeout: 5m  # 运行超时时间，默认5分钟
+  tests: false # 设置为true会在lint时运行tests
+
+# 设置各个 linters 的规则
+linters:
+  enable:
+    - govet              # Go vet，静态分析工具，检查代码中的错误
+    - errcheck           # 检查未处理的错误
+    - staticcheck        # 静态检查
+    - gofmt              # 格式化检查
+    - goimports          # 检查 import 的排序和格式
+    - gosimple           # 简单代码风格检查
+    - unused             # 检查未使用的代码
+    - structcheck        # 检查未使用的 struct 字段
+    - varcheck           # 检查未使用的变量
+    - deadcode           # 检查未使用的代码
+    - typecheck          # 类型检查
+    - ineffassign        # 检查无效的赋值
+    - misspell           # 拼写检查
+    - dupl               # 重复代码检查
+    - gocritic           # 检查代码问题的工具
+    - cyclop             # 复杂度检查，默认超过 10 会报警
